@@ -1,0 +1,262 @@
+<?php 
+
+require_once 'sessionData.php';
+$leaveTypes = json_decode($obj->getLeaveTypes());
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+<?php include 'includes/header.php' ?>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <!-- Preloader -->
+        <div class="preloader flex-column justify-content-center align-items-center">
+            <img class="animation__shake" src="dist/img/HRIS.png" alt="AdminLTELogo" height="200" width="200">
+        </div>
+        <!-- Navbar -->
+        <?php include 'includes/topbar.php' ?>
+        <!-- /.navbar -->
+
+        <!-- Main Sidebar Container -->
+        <?php include 'includes/sidebar.php' ?>
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 class="m-0">Leave Types</h1>
+                        </div>
+                        <!-- /.col -->
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                                <li class="breadcrumb-item active">Leave Types</li>
+                            </ol>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                </div>
+                <!-- /.container-fluid -->
+            </div>
+            <!-- /.content-header -->
+
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <!-- /.row -->
+                    <!-- Main row -->
+                    <div class="row">
+                        <!-- Left col -->
+                        <section class="col-12 connectedSortable">
+                            <!-- Custom tabs (Charts with tabs)-->
+                            <div class="card">
+                                <div style="display: flex;justify-content: end;">
+                                    <button type="button" class="btn btn-block btn-primary" style="width: 163px;margin-right: 22px;margin-top: 17px;" data-toggle="modal" data-target="#add-department-modal"> <i class="ion ion-plus"></i> Add
+                                        Leave Type</button>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body">
+                                    <table id="example2" class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Leave Name</th>
+                                                <th>Leave Days</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php 
+                                            if(empty($leaveTypes)){
+                                            }else{
+                                                foreach($leaveTypes as $leaveType){
+                                                    echo '<tr>
+                                                        <td>'.$leaveType->name.'</td>
+                                                        <td>'.$leaveType->duration.'</td>                                                                                        
+                                                        <td  style="color:blue; cursor: pointer">
+                                                            <button type="button" class="btn btn-default department-view-button" data-toggle="modal" data-target="#modal-default"
+                                                            data-id='.$leaveType->id.' 
+                                                            style="
+                                                                    border: none;
+                                                                ">
+                                                           Edit
+                                                            </button>
+                                                        </td></tr>';
+                                                    }
+                                            }
+                                          ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+                            <!-- /.card -->
+                        </section>
+                        <!-- /.Left col -->
+                    </div>
+                    <!-- /.row (main row) -->
+                </div>
+                <!-- /.container-fluid -->
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+        <?php include 'includes/footer.php' ?>
+
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+        <!-- /.control-sidebar -->
+    </div>
+    <?php include 'includes/scripts.php' ?>
+    <script>
+        $(document).ready(function() {
+            var Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3500
+            });
+            $("#example1").DataTable({
+                "responsive": true,
+                "lengthChange": false,
+                "autoWidth": false,
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+            $('#example2').DataTable({
+                "paging": true,
+                "lengthChange": false,
+                "searching": false,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false,
+                "responsive": true,
+            });
+
+            $('#add-department-modal').on('shown.bs.modal', function() {
+                $('#add-plan-form').submit(function(event) {
+                    event.preventDefault();
+                    if (!$("#duration").val() || !$("#leave-type-name").val()) {
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Please fill in all the fields'
+                        })
+                        return;
+                    }
+
+                    var button = $("#add-department-button")
+                    button.text("Submitting..")
+                    button.prop("disabled", true)
+
+                    $.ajax({
+                        type: 'POST',
+                        url: 'middleware.php',
+                        data: {
+                            addLeaveType: true,
+                            name: $("#leave-type-name").val(),
+                            duration: $("#duration").val()
+                        },
+                        success: function(response) {
+                            button.text("Submit")
+                            button.prop("disabled", false)
+
+                            var response = JSON.parse(response)
+                            if (response.status == "success") {
+                                Toast.fire({
+                                    icon: "success",
+                                    title: "Successfully added leave type"
+                                })
+                                location.reload();
+                            } else {
+                                button.text("Submit")
+                                button.prop("disabled", false)
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: response.message
+                                })
+                            }
+                        }
+                    })
+                });
+
+                // Reset form validation on modal close
+                $('#add-plan').on('hidden.bs.modal', function() {
+                    $('#add-plan-form')[0].reset();
+                    $('#add-plan-form input, #add-plan-form select').removeClass('is-invalid');
+                });
+            });
+
+            $(".department-view-button").click(function(e) {
+                e.preventDefault();
+                var id = $(this).data("id");
+                $.ajax({
+                    type: 'GET',
+                    url: `leave_type_view.php?id=${id}`,
+                    success: function(response) {
+                        $("#department-details").html(response)
+                    }
+                });
+            })
+
+        })
+    </script>
+</body>
+
+<div class="modal fade" id="modal-default">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="display: inline">
+                <h4 class="modal-title" style="text-align: center">Leave Details</h4>
+            </div>
+            <div class="modal-body" id="department-details">
+
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+<div class="modal fade" id="add-department-modal">
+    <div class="modal-dialog ">
+        <div class="modal-content">
+            <div class="modal-header" style="display: inline">
+                <h4 class="modal-title" style="text-align: center">Add Leave Type</h4>
+            </div>
+            <div class="modal-body">
+                <form id="add-plan-form">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Leave Name</label>
+                            <input type="text" class="form-control" id="leave-type-name" placeholder="Enter leave name">
+                        </div>
+                        <div class="form-group">
+                            <label>Duration(days)</label>
+                            <input type="number" class="form-control" id="duration" placeholder="Enter leave days . e.g 21">
+                        </div>
+                    </div>
+                    <div class="card-footer" style="background: none;">
+                        <button type="submit" class="btn btn-primary" style="width: 100%;" id="add-department-button">Submit</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+
+
+</html>

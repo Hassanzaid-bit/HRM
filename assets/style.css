@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+* {
+    padding: 0;
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+body {
+    background-color: #EFF1F3;
+    position: relative;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    background-color: white;
+    padding: 10px 50px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.23);
+}
+
+.header strong {
+    font-size: 20px;
+}
+
+.header span {
+    color: grey;
+}
+
+.header button {
+    padding: 5px 10px;
+    /* color: #2baaed; */
+    cursor: pointer;
+}
+
+.invoice {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 100px;
+    margin-bottom: 100px;
+    width: 85%;
+    background-color: white;
+    box-shadow: 0 2px 5px #ccc;
+}
+
+.invoice .invoice-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 40px 65px;
+}
+
+.invoice .invoice-address {
+    padding: 50px 61px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.invoice .invoice-items.items-header {
+    display: flex;
+    justify-content: space-around;
+    /* padding: 15px 25px; */
+    padding: 15px 0px;
+}
+
+.invoice .invoice-items {
+    display: flex;
+    justify-content: space-around;
+    /* padding: 10px 25px; */
+    padding: 10px 0px;
+}
+
+.invoice .summary-total {
+  	padding: 2rem 3rem;
+    display: flex;
+    justify-content: end;
+}
+
+.invoice .summary-total-detail {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+}
+
+.invoice .summary-total-detail.amount-due strong#total {
+    padding-right: 10px; 
+}
+
+.invoice .payment-details {
+    padding: 20px 51px;
+}
+
+.invoice .invoice-footer {
+    background-color: #EFF1F3;
+    /* border: 1px solid grey; */
+    padding: 25px 48px;
+}
+
+.invoice .invoice-footer h1 {
+    padding: 7px 0px;
+}
+
+.invoice .invoice-footer div {
+    padding: 7px 0px;
+}
+
+.page-footer {
+    background: white;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: -94px 0px;
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+}
+
+.table-wrapper {
+    padding: 0 3rem;
+}
+
+@media only screen and (max-width: 740px) {
+    .invoice {
+        width: 153%;
+    }
+	.page-footer{
+		width: 160%;
+	}
+}

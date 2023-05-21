@@ -1,0 +1,210 @@
+<?php 
+require_once 'sessionData.php';
+$roles = json_decode($obj->getRoles());
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+<?php include 'includes/header.php' ?>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <!-- Preloader -->
+        <div class="preloader flex-column justify-content-center align-items-center">
+            <img class="animation__shake" src="dist/img/HRIS.png" alt="AdminLTELogo" height="200" width="200">
+        </div>
+        <!-- Navbar -->
+        <?php include 'includes/topbar.php' ?>
+        <!-- /.navbar -->
+
+        <!-- Main Sidebar Container -->
+        <?php include 'includes/sidebar.php' ?>
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 class="m-0">Roles</h1>
+                        </div>
+                        <!-- /.col -->
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                                <li class="breadcrumb-item active">Roles</li>
+                            </ol>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                </div>
+                <!-- /.container-fluid -->
+            </div>
+            <!-- /.content-header -->
+
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <!-- /.row -->
+                    <!-- Main row -->
+                    <div class="row">
+                        <!-- Left col -->
+                        <section class="col-12 connectedSortable">
+                            <!-- Custom tabs (Charts with tabs)-->
+                            <div class="card">
+                                <div style="display: flex;justify-content: end;">
+                                    <button type="button" class="btn btn-block btn-primary" style="width: 145px;margin-right: 22px;margin-top: 17px;" data-toggle="modal" data-target="#add-company-modal"> <i class="ion ion-plus"></i> Add
+                                        Role</button>
+                                </div>
+                                <div class="card-body">
+                                    <table id="companies-table" class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Role Name</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php 
+                                            foreach($roles as $role){
+                                              echo '<tr>
+                                                <td>'.$role->name.'</td>
+                                             </tr>';
+                                            }
+                                          ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+                            <!-- /.card -->
+                        </section>
+                        <!-- /.Left col -->
+                    </div>
+                    <!-- /.row (main row) -->
+                </div>
+                <!-- /.container-fluid -->
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+        <?php include 'includes/footer.php' ?>
+
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+        <!-- /.control-sidebar -->
+    </div>
+    <?php include 'includes/scripts.php' ?>
+    <script>
+        $(function() {
+            $("#example1").DataTable({
+                "responsive": true,
+                "lengthChange": false,
+                "autoWidth": false,
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+            $('#companies-table').DataTable({
+                "paging": true,
+                "lengthChange": false,
+                "searching": false,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false,
+                "responsive": true,
+            });
+        });
+
+        $(".company-view-button").click(function(e) {
+            e.preventDefault();
+            var id = $(this).data("id");
+            $.ajax({
+                type: 'GET',
+                url: `company_view.php?id=${id}`,
+                success: function(response) {
+                    $("#company-details").html(response)
+                }
+            });
+        })
+    </script>
+</body>
+
+<div class="modal fade" id="add-company-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="display: inline">
+                <h4 class="modal-title" style="text-align: center">Add Role</h4>
+            </div>
+            <div class="modal-body" id="company-details">
+                <form id="add-plan-form">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Role Name</label>
+                            <input type="text" class="form-control" id="role-name" placeholder="Enter role name" name="roleName" required>
+                        </div>
+                    </div>
+                    <div class="card-footer" style="background: none;">
+                        <button type="submit" class="btn btn-primary" style="width: 100%;" id="add-company-button">Submit</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+</html>
+
+
+
+<script>
+    $(document).ready(function() {
+        var Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2500
+        });
+
+        $("#add-company-button").click(function(e) {
+            e.preventDefault();
+            var button = $(this)
+            var roleName = $("#role-name").val();
+
+            if (!roleName) {
+                alert("Please input all fields");
+                return
+            }
+
+            button.text("Submitting..")
+            button.prop("disabled", true)
+
+            $.ajax({
+                type: 'POST',
+                url: 'middleware.php',
+                data: {
+                    addRole: true,
+                    roleName: roleName
+                },
+                success: function(response) {
+                    console.log(response)
+                    var response = JSON.parse(response);
+                    if (response.status == "success") {
+                        location.reload();
+                    } else {
+                        button.text("Submit")
+                        button.prop("disabled", false)
+                        alert(response.message)
+                    }
+                }
+            })
+
+        })
+    })
+</script>

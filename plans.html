@@ -1,0 +1,570 @@
+<?php
+session_start(); 
+require_once 'apis/47Billing.class.php';
+$obj = new Billing();
+$plans = json_decode($obj->getPlans());
+$features = json_decode($obj->getAllfeatures());
+$billTerms = json_decode($obj->getBillTerms());
+
+?>
+
+    <?php include 'includes/header.php' ?>
+
+    <style>
+        /* Styles for the selected options */
+        
+        .select2-selection__choice {
+            background-color: #17a2b8 !important;
+            /* Change to desired background color */
+            color: #fff;
+            /* Change to desired text color */
+            border: none;
+            /* Optional: remove border */
+        }
+        /* Styles for the close button on selected options (optional) */
+        
+        .select2-selection__choice__remove {
+            color: red;
+            /* Change to desired close button color */
+            font-weight: bold;
+            margin-right: 5px;
+        }
+    </style>
+
+    <body class="hold-transition sidebar-mini layout-fixed">
+        <div class="wrapper">
+            <!-- Preloader -->
+            <div class="preloader flex-column justify-content-center align-items-center">
+                <img class="animation__shake" src="dist/img/HRIS.png" alt="AdminLTELogo" height="100" width="100">
+            </div>
+            <!-- Navbar -->
+            <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+                <!-- Left navbar links -->
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                    </li>
+                    <li class="nav-item d-none d-sm-inline-block">
+                        <a href="index.html" class="nav-link">Home</a>
+                    </li>
+                </ul>
+                <!-- Right navbar links -->
+                <ul class="navbar-nav ml-auto">
+                    <!-- Navbar Search -->
+                    <li class="nav-item">
+                        <a class="nav-link" data-widget="navbar-search" href="#" role="button">
+                            <i class="fas fa-search"></i>
+                        </a>
+                        <div class="navbar-search-block">
+                            <form class="form-inline">
+                                <div class="input-group input-group-sm">
+                                    <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-navbar" type="submit">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                        <button class="btn btn-navbar" type="button" data-widget="navbar-search">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" data-widget="fullscreen" href="#" role="button">
+                            <i class="fas fa-expand-arrows-alt"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-widget="control-sidebar" data-controlsidebar-slide="true" href="#" role="button">
+                            <i class="fas fa-th-large"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <!-- /.navbar -->
+
+            <!-- Main Sidebar Container -->
+            <?php include 'includes/sidebar.php' ?>
+
+            <!-- Content Wrapper. Contains page content -->
+            <div class="content-wrapper">
+                <!-- Content Header (Page header) -->
+                <div class="content-header">
+                    <div class="container-fluid">
+                        <div class="row mb-2">
+                            <div class="col-sm-6">
+                                <h1 class="m-0">Plans & Features</h1>
+                            </div>
+                            <!-- /.col -->
+                            <div class="col-sm-6">
+                                <ol class="breadcrumb float-sm-right">
+                                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                                    <li class="breadcrumb-item active">Plans & Features</li>
+                                </ol>
+                            </div>
+                            <!-- /.col -->
+                        </div>
+                        <!-- /.row -->
+                    </div>
+                    <!-- /.container-fluid -->
+                </div>
+                <!-- /.content-header -->
+
+                <!-- Main content -->
+                <section class="content">
+                    <div class="container-fluid">
+                        <div class="card card-primary card-outline">
+                            <div class="card-body">
+                                <ul class="nav nav-tabs" id="custom-content-below-tab" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" id="custom-content-below-home-tab" data-toggle="pill" href="#custom-content-below-home" role="tab" aria-controls="custom-content-below-home" aria-selected="true">Plans</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="custom-content-below-profile-tab" data-toggle="pill" href="#custom-content-below-profile" role="tab" aria-controls="custom-content-below-profile" aria-selected="false">Features</a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content" id="custom-content-below-tabContent">
+                                    <div class="tab-pane fade show active" id="custom-content-below-home" role="tabpanel" aria-labelledby="custom-content-below-home-tab">
+                                        <div class="row">
+                                            <section class="col-12 connectedSortable">
+                                                <div class="card">
+                                                    <div class="card-header" style="cursor: move;display: flex;justify-content: center;">
+                                                        <h3 class="card-title" style="font-weight: bold">SUBSCRIPTION PLANS
+                                                        </h3>
+
+                                                    </div>
+                                                    <div style="display: flex;justify-content: end;">
+                                                        <button type="button" class="btn btn-block btn-primary" style="width: 110px;margin-right: 22px;margin-top: 17px;" data-toggle="modal" data-target="#add-plan"> <i
+                                                            class="ion ion-plus"></i> Add
+                                                        Plan</button>
+                                                    </div>
+                                                    <!-- /.card-header -->
+                                                    <div class="card-body">
+                                                        <table id="plan-table" class="table table-bordered table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Id</th>
+                                                                    <th>Plan Name</th>
+                                                                    <th>Bill Term</th>
+                                                                    <th>Amount</th>
+                                                                    <th>Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <?php 
+                                                            foreach ($plans as $plan) {
+                                                                echo '<tr>
+                                                                    <td>'.$plan->id.'</td>
+                                                                    <td>'.$plan->planName.'</td>
+                                                                    <td>'.$plan->billTerm.'</td>
+                                                                    <td>'.number_format((float)$plan->amount, 2, ".", ",").' KES</td>
+                                                                    <td style="color: blue; cursor: pointer">
+                                                                        <button type="button" class="btn btn-default plan-view-button" data-toggle="modal" data-target="#modal-default" data-id="'.$plan->id.'" style="background: none; border: none; color: blue;">
+                                                                            More details
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>';
+                                                            }
+                                                        ?>
+
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <!-- /.card-body -->
+                                                </div>
+                                            </section>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="custom-content-below-profile" role="tabpanel" aria-labelledby="custom-content-below-profile-tab">
+                                        <div class="row">
+                                            <section class="col-12 connectedSortable">
+                                                <div class="card">
+                                                    <div class="card-header" style="cursor: move;display: flex;justify-content: center;">
+                                                        <h3 class="card-title" style="font-weight: bold">SUBSCRIPTION FEATURES
+                                                        </h3>
+
+                                                    </div>
+                                                    <div style="display: flex;justify-content: end;">
+                                                        <button type="button" class="btn btn-block btn-primary" style="width: 135px;margin-right: 22px;margin-top: 17px;" data-toggle="modal" data-target="#add-feature"> <i
+                                                            class="ion ion-plus"></i> Add
+                                                        Feature</button>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <table id="features-table" class="table table-bordered table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Id</th>
+                                                                    <th>Feature Name</th>
+                                                                    <th>Token</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <?php 
+                                                            foreach ($features as $feature) {
+                                                                if(!$feature->token || $feature->token == ""){
+                                                                    $feature->token = "N/A";
+                                                                }
+                                                                echo '<tr>
+                                                                    <td>'.$feature->id.'</td>
+                                                                    <td>'.$feature->feature_name.'</td>
+                                                                    <td>'.$feature->token.'</td>
+                                                                </tr>';
+                                                            }
+                                                        ?>
+
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <!-- /.card-body -->
+                                                </div>
+                                                <!-- /.card -->
+                                            </section>
+                                            <!-- /.Left col -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-custom-content">
+                                    <p class="lead mb-0">Custom Content goes here</p>
+                                </div>
+
+                            </div>
+                            <!-- /.card -->
+                        </div>
+                    </div>
+                    <!-- /.container-fluid -->
+                </section>
+                <!-- /.content -->
+            </div>
+            <!-- /.content-wrapper -->
+            <?php include 'includes/footer.php' ?>
+
+
+            <!-- Control Sidebar -->
+            <aside class="control-sidebar control-sidebar-dark">
+                <!-- Control sidebar content goes here -->
+            </aside>
+            <!-- /.control-sidebar -->
+        </div>
+        <?php include 'includes/scripts.php' ?>
+        <script>
+            $(document).ready(function() {
+                var Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3500
+                });
+
+                if (window.location.search === "?status=success") {
+                    Toast.fire({
+                        icon: "success",
+                        title: "Successfully added subscription plan"
+                    });
+                }
+                if (window.location.search === "?status=success&feature=true") {
+                    Toast.fire({
+                        icon: "success",
+                        title: "Successfully added feature"
+                    });
+
+                    // Remove "active" class from the current active tab
+                    $('.nav-link.active').removeClass('active');
+
+                    // Add "active" class to the "Features" tab
+                    $('#custom-content-below-profile-tab').addClass('active');
+
+                    // Show the "Features" tab content
+                    $('#custom-content-below-profile').addClass('show active');
+
+                    // Hide the current tab content (if needed)
+                    $('#custom-content-below-home').removeClass('show active');
+                }
+
+                $('#plan-table').DataTable({
+                    "paging": true,
+                    "lengthChange": false,
+                    "searching": false,
+                    "ordering": true,
+                    "info": true,
+                    "autoWidth": false,
+                    "responsive": true,
+                });
+
+                $('#features-table').DataTable({
+                    "paging": true,
+                    "lengthChange": false,
+                    "searching": false,
+                    "ordering": true,
+                    "info": true,
+                    "autoWidth": false,
+                    "responsive": true,
+                });
+
+
+                //Initialize Select2 Elements
+                $('.select2').select2()
+
+                //Initialize Select2 Elements
+                $('.select2bs4').select2({
+                    theme: 'bootstrap4'
+                })
+
+                $(".plan-view-button").click(function(e) {
+                    e.preventDefault();
+                    var id = $(this).data("id");
+                    $.ajax({
+                        type: 'GET',
+                        url: `plan_view.php?id=${id}`,
+                        success: function(response) {
+                            $("#plan-details").html(response)
+                        }
+                    });
+                })
+
+                $('#add-plan').on('shown.bs.modal', function() {
+                    $('#add-plan-form').submit(function(event) {
+                        event.preventDefault();
+                        var selectedValues = [];
+                        var isEmpty = false;
+                        $('#add-plan-form input, #add-plan-form select').each(function() {
+                            if ($(this).val() === '') {
+                                isEmpty = true;
+                                $(this).addClass(
+                                    'is-invalid'); // Add a class to highlight the empty field
+                                // Check if the field is a select input
+                            } else {
+                                $(this).removeClass(
+                                    'is-invalid'); // Remove the class if the field is filled
+                            }
+                        });
+
+                        $('.select2-selection__rendered li').each(function() {
+                            var selectedValue = $(this).attr('data-select2-id');
+                            selectedValues.push(selectedValue);
+                        });
+
+                        if (selectedValues.length !== 0) {
+                            isEmpty = false
+                        }
+
+                        if (isEmpty) {
+                            Toast.fire({
+                                icon: 'error',
+                                title: 'Please fill in all the fields'
+                            })
+                            return
+                        } else {
+                            var button = $("#add-plan-button")
+                            button.text("Submitting..")
+                            button.prop("disabled", true)
+                            var planName = $("#plan-name").val()
+                            var amount = $("#plan-amount").val()
+                            var billTerm = $("#plan-bill-term").val()
+                            var features = $("#selected-features").val()
+
+                            var featuresObj = {}
+
+                            $.each(features, function(index, value) {
+                                featuresObj[value] = value
+                            })
+
+                            features = JSON.stringify(featuresObj);
+
+                            var addPlan = true;
+                            $.ajax({
+                                type: 'POST',
+                                url: 'middleware.php',
+                                data: {
+                                    addPlan,
+                                    planName,
+                                    amount,
+                                    billTerm,
+                                    features
+                                },
+                                success: function(response) {
+                                    button.text("Submit")
+                                    button.prop("disabled", false)
+
+                                    var response = JSON.parse(response)
+                                    if (response.status == "success") {
+                                        Toast.fire({
+                                            icon: "success",
+                                            title: "Successfully added subscription plan"
+                                        })
+                                        window.location.href =
+                                            encodeURI("plans.html?status=success");
+                                    } else {
+                                        button.text("Submit")
+                                        button.prop("disabled", false)
+                                        Toast.fire({
+                                            icon: 'error',
+                                            title: response.message
+                                        })
+                                    }
+                                }
+                            })
+
+                            $('#add-plan').modal('hide'); // Close the modal
+                            $('#add-plan-form')[0].reset(); // Reset the form
+                        }
+                    });
+
+                    // Reset form validation on modal close
+                    $('#add-plan').on('hidden.bs.modal', function() {
+                        $('#add-plan-form')[0].reset();
+                        $('#add-plan-form input, #add-plan-form select').removeClass('is-invalid');
+                    });
+                });
+
+
+                $("#add-feature-button").click(function(e) {
+                    e.preventDefault();
+                    var button = $(this);
+                    var addFeature = true;
+                    var featureName = $("#feature-name").val();
+                    var featureToken = $("#feature-token").val()
+                    $.ajax({
+                        type: 'POST',
+                        url: 'middleware.php',
+                        data: {
+                            addFeature,
+                            featureName,
+                            featureToken
+                        },
+                        success: function(response) {
+                            button.text("Submit")
+                            button.prop("disabled", false)
+
+                            var response = JSON.parse(response)
+                            if (response.status == "success") {
+                                window.location.href =
+                                    encodeURI("plans.html?status=success&feature=true");
+                            } else {
+                                button.text("Submit")
+                                button.prop("disabled", false)
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: response.message
+                                })
+                            }
+                        }
+                    })
+
+                })
+            });
+        </script>
+
+    </body>
+
+
+
+    <div class="modal fade" id="add-plan">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="display: inline">
+                    <h4 class="modal-title" style="text-align: center">Add Plan</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="add-plan-form">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Plan Name</label>
+                                <input type="text" class="form-control" id="plan-name" placeholder="Enter plan name">
+                            </div>
+                            <div class="form-group">
+                                <label for="">Amount</label>
+                                <input type="number" class="form-control" id="plan-amount" placeholder="Enter amount">
+                            </div>
+                            <div class="form-group">
+                                <label>Bill Term</label>
+                                <select class="form-control" id="plan-bill-term">
+                                <option value="" disabled selected>Select Bill Term</option>
+                                <?php
+                                    foreach($billTerms as $billterm){
+                                        echo '<option value="'.$billterm->id.'">'.$billterm->name.'</option>';
+                                    }
+                                ?>
+                            </select>
+                                <div class="invalid-feedback">Please select a bill term.</div>
+                            </div>
+                            <div class="form-group">
+                                <label>Features</label>
+                                <select class="select2" multiple="multiple" data-placeholder="Select a Feature" style="width: 100%;" id="selected-features">
+                                <?php
+                                    foreach($features as $feature){
+                                        echo '<option value="'.$feature->id.'">'.$feature->feature_name.'</option>';
+                                    }
+                                ?>
+                            </select>
+                                <div class="invalid-feedback">Please select a feature</div>
+                            </div>
+                        </div>
+                        <div class="card-footer" style="background: none;">
+                            <button type="submit" class="btn btn-primary" style="width: 100%;" id="add-plan-button">Submit</button>
+                        </div>
+                    </form>
+
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+
+    <div class="modal fade" id="add-feature">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="display: inline">
+                    <h4 class="modal-title" style="text-align: center">Add Feature</h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Feature Name</label>
+                                <input type="text" class="form-control" id="feature-name" placeholder="Enter feature name">
+                            </div>
+                            <div class="form-group">
+                                <label for="">Token</label>
+                                <input type="number" class="form-control" id="feature-token" placeholder="Enter token">
+                            </div>
+
+                        </div>
+                        <div class="card-footer" style="background: none;">
+                            <button type="submit" class="btn btn-primary" style="width: 100%;" id="add-feature-button">Submit</button>
+                        </div>
+                    </form>
+
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+
+    <div class="modal fade" id="modal-default">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="display: inline">
+                    <h4 class="modal-title" style="text-align: center">Plan Details</h4>
+                </div>
+                <div class="modal-body" id="plan-details">
+
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>

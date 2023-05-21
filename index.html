@@ -1,0 +1,355 @@
+<?php 
+require_once 'sessionData.php';
+
+
+if($role == 1){ // Employee
+    $leaveApplications = json_decode($obj->getEmployeeLeaveApplications($userId));
+    $tasks = json_decode($obj->getTasksByEmpId($userId));
+}elseif($role == 2){ // HOD
+    $leaveApplications = json_decode($obj->getLeaveApplicationsByDept($department));
+    $tasks = json_decode($obj->getTasksByDpt($department));
+}elseif($role == 3){ // Super Admin
+    $leaveApplications = json_decode($obj->getLeaveApplications());
+    $tasks = json_decode($obj->getTasks());
+}
+$allLeave = 0;
+$approvedLeave = 0;
+$pendingLeave = 0;
+
+$allTasks = 0;
+$completedTasks = 0;
+$pendingTasks = 0;
+
+if(!empty($leaveApplications)){
+    foreach($leaveApplications as $app){
+        $allLeave += 1;
+        if($app->status == "Approved"){
+            $approvedLeave += 1;
+        }elseif($app->status == "Pending"){
+            $pendingLeave += 1;
+        }
+    }
+}
+
+if(!empty($tasks)){
+    foreach($tasks as $task){
+        $allTasks += 1;
+        if($task->status == "Completed"){
+            $completedTasks += 1;
+        }elseif($task->status == "Not Completed"){
+            $pendingTasks += 1;
+        }
+    }
+}
+
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+<?php include 'includes/header.php' ?>
+
+
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <!-- Preloader -->
+        <div class="preloader flex-column justify-content-center align-items-center">
+            <img class="animation__shake" src="<?php echo $logo ?>" alt="AdminLTELogo" height="200" width="200">
+        </div>
+        <!-- Navbar -->
+        <?php include 'includes/topbar.php' ?>
+        <!-- /.navbar -->
+
+        <!-- Main Sidebar Container -->
+        <?php include 'includes/sidebar.php' ?>
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 class="m-0">Dashboard</h1>
+                        </div>
+                        <!-- /.col -->
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                                <li class="breadcrumb-item active">Dashboard</li>
+                            </ol>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                </div>
+                <!-- /.container-fluid -->
+            </div>
+            <!-- /.content-header -->
+
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <!-- Small boxes (Stat box) -->
+                    <h3>Leave Stats</h3>
+                    <div class="row">
+                        <div class="col-lg-4 col-6">
+                            <!-- small box -->
+                            <div class="small-box bg-info">
+                                <div class="inner">
+                                    <h3>
+                                        <?php echo $allLeave ?>
+                                    </h3>
+                                    <p>Leave Applications</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fas fa-mobile-alt"></i>
+                                </div>
+                                <a href="#" class="small-box-footer d-none">More info <i
+                                        class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                        <!-- ./col -->
+                        <div class="col-lg-4 col-6">
+                            <!-- small box -->
+                            <div class="small-box bg-warning">
+                                <div class="inner">
+                                    <h3>
+                                        <?php echo $pendingLeave ?><sup style="font-size: 20px"></sup></h3>
+                                    <p>Pending Leave Applications</p>
+                                </div>
+                                <div class="icon">
+                                    <i class='fas fa-envelope-open-text'></i>
+                                </div>
+                                <a href="#" class="small-box-footer d-none">More info <i
+                                        class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                        <!-- ./col -->
+                        <div class="col-lg-4 col-6">
+                            <!-- small box -->
+                            <div class="small-box bg-success">
+                                <div class="inner">
+                                    <h3>
+                                        <?php echo $approvedLeave ?>
+                                    </h3>
+
+                                    <p>Approved Leave Applications</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-clock"></i>
+                                </div>
+                                <a href="#" class="small-box-footer d-none">More info <i
+                                        class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <h3>Task Stats</h3>
+                    <div class="row">
+                        <div class="col-lg-4 col-6">
+                            <div class="small-box bg-info">
+                                <div class="inner">
+                                    <h3>
+                                        <?php echo $allTasks ?>
+                                    </h3>
+                                    <p>Tasks</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fas fa-mobile-alt"></i>
+                                </div>
+                                <a href="#" class="small-box-footer d-none">More info <i
+                                        class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                        <!-- ./col -->
+                        <div class="col-lg-4 col-6">
+                            <!-- small box -->
+                            <div class="small-box bg-warning">
+                                <div class="inner">
+                                    <h3>
+                                        <?php echo $pendingTasks ?><sup style="font-size: 20px"></sup></h3>
+                                    <p>Pending Tasks</p>
+                                </div>
+                                <div class="icon">
+                                    <i class='fas fa-envelope-open-text'></i>
+                                </div>
+                                <a href="#" class="small-box-footer d-none">More info <i
+                                        class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                        <!-- ./col -->
+                        <div class="col-lg-4 col-6">
+                            <!-- small box -->
+                            <div class="small-box bg-success">
+                                <div class="inner">
+                                    <h3>
+                                        <?php echo $completedTasks ?>
+                                    </h3>
+
+                                    <p>Completed Tasks</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-clock"></i>
+                                </div>
+                                <a href="#" class="small-box-footer d-none">More info <i
+                                        class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.row -->
+                    <!-- Main row -->
+                    <div class="row d-none">
+                        <!-- Left col -->
+                        <section class="col-12 connectedSortable">
+                            <div class="card">
+                                <div class="card-header" style="cursor: move;display: flex;justify-content: center;">
+                                    <h3 class="card-title" style="font-weight: bold">Sent Invoices
+                                    </h3>
+
+                                </div>
+                                <div class="card-body">
+                                    <table id="example2" class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Id</th>
+                                                <th>Client Name</th>
+                                                <th>Amount</th>
+                                                <th>Date Created</th>
+                                                <th>Invoice Link</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php 
+                                            foreach($invoices as $invoice){
+                                              $date = date("d M, Y", strtotime($invoice->DocDate));
+
+                                              echo '<tr>
+                                                <td>'.$invoice->DocEntry.'</td>
+                                                <td>'.$invoice->CardName.'</td>
+                                                <td>'.number_format((float)$invoice->DocTotal, 2, ".", ",").'</td>
+                                                <td>'.$date.'</td>
+                                                <td><a target="_blank" href="invoice.php?num='.$invoice->encryptedLink.'" >view Invoice</a></td>
+                                              </tr>';
+                                            }
+                                          ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <?php include 'includes/footer.php' ?>
+        <aside class="control-sidebar control-sidebar-dark">
+        </aside>
+    </div>
+    <?php include 'includes/scripts.php' ?>
+    <script>
+    $(document).ready(function() {
+        var Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3500
+        });
+
+        $("#example1").DataTable({
+            "responsive": true,
+            "lengthChange": false,
+            "autoWidth": false,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        $('#example2').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+        });
+
+        $(".invoice-view-button").click(function(e) {
+            e.preventDefault();
+            var id = $(this).data("id");
+            var planId = $(this).data("planId")
+            var docEntry = $(this).data("docEntry")
+            console.log(docEntry);
+            $.ajax({
+                type: 'GET',
+                url: `client_inv_view.html?id=${id}&docEntry=${docEntry}`,
+                success: function(response) {
+                    $("#invoice-details").html(response)
+                }
+            });
+        })
+    })
+    </script>
+</body>
+
+<div class="modal fade" id="modal-default">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="display: inline">
+                <h4 class="modal-title" style="text-align: center">Invoice Details</h4>
+            </div>
+            <div class="modal-body" id="invoice-details">
+
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<div class="modal fade" id="add-invoice-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="display: inline">
+                <h4 class="modal-title" style="text-align: center">Add invoice</h4>
+            </div>
+            <div class="modal-body" id="add-company-invoice-details">
+                <form id="add-company-invoice-form">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>invoice Plan</label>
+                            <select class="form-control" id="invoicePlan">
+                                <option value="" disabled selected>Select Plan</option>
+                                <?php
+                                    foreach($plans as $plan){
+                                        echo '<option value="'.$plan->id.'">'.$plan->planName.'</option>';
+                                    }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Company</label>
+                            <select class="form-control" id="companyName">
+                                <option value="" disabled selected>Select Company</option>
+                                <?php
+                                    foreach($allcompanies as $company){
+                                        echo '<option value="'.$company->id.'">'.$company->company_name.'</option>';
+                                    }
+                                ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-footer" style="background: none;">
+                        <button type="submit" class="btn btn-primary" style="width: 100%;"
+                            id="add-company-invoice-button">Submit</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+</html>

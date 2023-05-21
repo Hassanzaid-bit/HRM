@@ -1,0 +1,439 @@
+<?php 
+
+require_once 'sessionData.php';
+$leaveApplications = json_decode($obj->getLeaveApplications());
+$employee = json_decode($obj->getEmployeeById($userId));
+$leaveTypes = json_decode($obj->getLeaveTypes());
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+<?php include 'includes/header.php' ?>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <!-- Preloader -->
+        <div class="preloader flex-column justify-content-center align-items-center">
+            <img class="animation__shake" src="dist/img/HRIS.png" alt="AdminLTELogo" height="200" width="200">
+        </div>
+        <!-- Navbar -->
+        <?php include 'includes/topbar.php' ?>
+        <!-- /.navbar -->
+
+        <!-- Main Sidebar Container -->
+        <?php include 'includes/sidebar.php' ?>
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 class="m-0">Leave Applications</h1>
+                        </div>
+                        <!-- /.col -->
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                                <li class="breadcrumb-item active">Leave Applications</li>
+                            </ol>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                </div>
+                <!-- /.container-fluid -->
+            </div>
+            <!-- /.content-header -->
+
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <!-- /.row -->
+                    <!-- Main row -->
+                    <div class="row">
+                        <!-- Left col -->
+                        <section class="col-12 connectedSortable">
+                            <!-- Custom tabs (Charts with tabs)-->
+                            <div class="card">
+                                <div style="display: flex;justify-content: end;">
+                                    <button type="button" class="btn btn-block btn-primary" style="width: 163px;margin-right: 22px;margin-top: 17px;" data-toggle="modal" data-target="#add-department-modal"> <i class="ion ion-plus"></i>Apply for
+                                        Leave</button>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body">
+                                    <table id="example2" class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Employee Name</th>
+                                                <th>Leave Type</th>
+                                                <th>Start Date</th>
+                                                <th>End Date</th>
+                                                <th>Status</th>
+                                                <th>Comment</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php 
+                                            if(empty($leaveApplications)){
+                                            }else{
+                                                foreach($leaveApplications as $leaveType){
+                                                    if(!$leaveType->comment){
+                                                        $comment = "N/A";
+                                                    }else{
+                                                        $comment = $leaveType->comment;
+                                                    }
+
+
+                                                    $badge = "";
+                                                    $showButtons = "";
+                                                    if($leaveType->status == "Approved"){
+                                                        $badge = "right badge badge-success";
+                                                        $showButtons = "d-none";
+                                                    }elseif($leaveType->status == "Pending"){
+                                                        $badge = "right badge badge-warning";
+                                                        $showButtons = "";
+                                                    }else{
+                                                        $badge = "right badge badge-danger";
+                                                         $showButtons = "d-none";
+                                                    }
+
+                                                   if($role == 2){
+                                                        echo '<tr>
+                                                            <td>'.$leaveType->employeeName.'</td>
+                                                            <td>'.$leaveType->leaveTypeName.'</td>                                                                                        
+                                                            <td>'.$leaveType->startDate.'</td>                                                                                        
+                                                            <td>'.$leaveType->endDate.'</td>                                                                                        
+                                                            <td> <span class="'.$badge.'">'.$leaveType->status.'</span> </td>                                                                                        
+                                                            <td>'.$comment.'</td>                                                                                        
+                                                            <td  style="color:blue; cursor: pointer" class="'.$showButtons.'">
+                                                                <button  data-id='.$leaveType->id.' type="button" class="btn btn-sm btn-success approve" data-toggle="tooltip" data-placement="top" title="Approve">
+                                                                    <i class="fas fa-check"></i>
+                                                                </button>
+
+                                                                <button  data-id='.$leaveType->id.' type="button" class="btn btn-sm btn-danger reject" data-toggle="tooltip" data-placement="top" title="Reject">
+                                                                    <i class="fas fa-times"></i>
+                                                                </button>
+                                                            </td>
+                                                            </tr>';
+                                                    }else{
+                                                          echo '<tr>
+                                                            <td>'.$leaveType->employeeName.'</td>
+                                                            <td>'.$leaveType->leaveTypeName.'</td>                                                                                        
+                                                            <td>'.$leaveType->startDate.'</td>                                                                                        
+                                                            <td>'.$leaveType->endDate.'</td>                                                                                        
+                                                            <td> <span class="'.$badge.'">'.$leaveType->status.'</span> </td>                                                                                        
+                                                            <td>'.$comment.'</td>                                                                                        
+                                                            </tr>';
+                                                    }
+                                                    }
+                                            }
+                                          ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+                            <!-- /.card -->
+                        </section>
+                        <!-- /.Left col -->
+                    </div>
+                    <!-- /.row (main row) -->
+                </div>
+                <!-- /.container-fluid -->
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+        <?php include 'includes/footer.php' ?>
+
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+        <!-- /.control-sidebar -->
+    </div>
+    <?php include 'includes/scripts.php' ?>
+    <script>
+        $(document).ready(function() {
+            var Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3500
+            });
+            $("#example1").DataTable({
+                "responsive": true,
+                "lengthChange": false,
+                "autoWidth": false,
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+            $('#example2').DataTable({
+                "paging": true,
+                "lengthChange": false,
+                "searching": false,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false,
+                "responsive": true,
+            });
+
+            $('#add-department-modal').on('shown.bs.modal', function() {
+                var startDateField = $('#start-date');
+                var endDateField = $('#end-date');
+
+                function calculateDays() {
+                    var startDateString = startDateField.val();
+                    var endDateString = endDateField.val();
+
+                    if (startDateString && endDateString) {
+                        var startDate = new Date(startDateString);
+                        var endDate = new Date(endDateString);
+
+                        if (startDate > endDate) {
+                            Toast.fire({
+                                icon: 'error',
+                                title: "Start date cannot be greater than end date"
+                            })
+                            return;
+                        }
+
+                        var timeDifference = endDate.getTime() - startDate.getTime();
+                        var daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
+                        $('#duration').val(daysDifference);
+                    }
+                }
+
+                startDateField.on('change', calculateDays);
+                endDateField.on('change', calculateDays);
+
+                $('#add-leave-button').click(function(event) {
+                    event.preventDefault();
+                    if (!$("#duration").val() || !$("#leave-type").val() || !$("#start-date")
+                        .val() || !$("#end-date").val()) {
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Please fill in all the fields'
+                        })
+                        return;
+                    }
+
+                    var button = $("#add-leave-button")
+                    button.text("Submitting..")
+                    button.prop("disabled", true)
+
+                    $.ajax({
+                        type: 'POST',
+                        url: 'middleware.php',
+                        data: {
+                            addLeaveApplication: true,
+                            employeeId: $("#employee-id").data("id"),
+                            leaveType: $("#leave-type").val(),
+                            startDate: $("#start-date").val(),
+                            endDate: $("#end-date").val(),
+                            comment: $("#comment").val(),
+                            duration: $("#duration").val()
+                        },
+                        success: function(response) {
+                            button.text("Submit")
+                            button.prop("disabled", false)
+
+                            var response = JSON.parse(response)
+                            if (response.status == "success") {
+                                Toast.fire({
+                                    icon: "success",
+                                    title: "Successfully added leave application"
+                                })
+                                location.reload();
+                            } else {
+                                button.text("Submit")
+                                button.prop("disabled", false)
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: response.message
+                                })
+                            }
+                        }
+                    })
+                });
+
+                // Reset form validation on modal close
+                $('#add-plan').on('hidden.bs.modal', function() {
+                    $('#add-plan-form')[0].reset();
+                    $('#add-plan-form input, #add-plan-form select').removeClass('is-invalid');
+                });
+            });
+
+            $(".department-view-button").click(function(e) {
+                e.preventDefault();
+                var id = $(this).data("id");
+                $.ajax({
+                    type: 'GET',
+                    url: `leave_type_view.php?id=${id}`,
+                    success: function(response) {
+                        $("#department-details").html(response)
+                    }
+                });
+            })
+
+            $(".approve").click(function(e) {
+                e.preventDefault();
+                var button = $(this)
+                    // button.prop("disabled", true)
+                    // $(".reject").prop("disabled", true)
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'middleware.php',
+                    data: {
+                        approveLeave: true,
+                        id: button.data("id"),
+                        userId: '<?php echo $userId ?>'
+                    },
+                    success: function(response) {
+                        console.log(response)
+                        var response = JSON.parse(response)
+                        if (response.status == "success") {
+                            Toast.fire({
+                                icon: "success",
+                                title: "Successfully added leave application"
+                            })
+                            location.reload();
+                        } else {
+                            button.prop("disabled", false)
+                            $(".reject").prop("disabled", false)
+                            Toast.fire({
+                                icon: "error",
+                                title: response.message
+                            })
+                        }
+                    }
+
+                })
+            })
+            $(".reject").click(function(e) {
+                e.preventDefault();
+                var button = $(this)
+                    // button.prop("disabled", true)
+                    // $(".reject").prop("disabled", true)
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'middleware.php',
+                    data: {
+                        rejectLeave: true,
+                        id: button.data("id"),
+                        userId: '<?php echo $userId ?>'
+                    },
+                    success: function(response) {
+                        console.log(response)
+                        var response = JSON.parse(response)
+                        if (response.status == "success") {
+                            Toast.fire({
+                                icon: "success",
+                                title: "Successfully rejected leave application"
+                            })
+                            location.reload();
+                        } else {
+                            button.prop("disabled", false)
+                            $(".reject").prop("disabled", false)
+                            Toast.fire({
+                                icon: "error",
+                                title: response.message
+                            })
+                        }
+                    }
+
+                })
+            })
+
+        })
+    </script>
+</body>
+
+<div class="modal fade" id="modal-default">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="display: inline">
+                <h4 class="modal-title" style="text-align: center">Leave Details</h4>
+            </div>
+            <div class="modal-body" id="department-details">
+
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+<div class="modal fade" id="add-department-modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="display: inline">
+                <h4 class="modal-title" style="text-align: center">Leave Details</h4>
+            </div>
+            <div class="modal-body">
+                <form id="add-plan-form">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Employee Name</label>
+                            <input type="text" class="form-control" id="employee-id" placeholder="Enter leave name" value="<?php echo $employee->firstName . " " . $employee->lastName ?>" data-id="<?php echo $employee->id ?>" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="">Leave Type</label>
+                            <select class="form-control" id="leave-type">
+                                <option value="" disabled selected>Select Leave Type</option>
+                                <?php
+                                    foreach($leaveTypes as $leaveType){
+                                        echo '<option value="'.$leaveType->id.'">'.$leaveType->name . "(" .$leaveType->duration ." Days". ")".'</option>';
+                                    }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Start Date</label>
+                                    <input type="date" class="form-control" id="start-date" placeholder="Enter Start Date">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>End Date</label>
+                                    <input type="date" class="form-control" id="end-date" placeholder="Enter End Date">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Duration(days)</label>
+                            <input type="number" class="form-control" id="duration" placeholder="Enter leave days . E.g 21" disabled>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Comment(optional)</label>
+                            <input type="text" class="form-control" id="comment" placeholder="E.g Brother's wedding..">
+                        </div>
+                    </div>
+                    <div class="card-footer" style="background: none;">
+                        <button type="submit" class="btn btn-primary" style="width: 100%;" id="add-leave-button">Submit</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+
+
+</html>
