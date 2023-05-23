@@ -24,7 +24,8 @@ $roles = json_decode($obj->getRoles());
 <!-- Bootstrap CSS -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <!-- DateTimePicker CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css">
+<link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css">
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
@@ -75,7 +76,9 @@ $roles = json_decode($obj->getRoles());
                             <div class="card">
                                 <?php if($role == 2) {?>
                                 <div style="display: flex;justify-content: end;">
-                                    <button type="button" class="btn btn-block btn-primary" style="width: 163px;margin-right: 22px;margin-top: 17px;" data-toggle="modal" data-target="#add-department-modal"> <i class="ion ion-plus"></i> Assign
+                                    <button type="button" class="btn btn-block btn-primary"
+                                        style="width: 163px;margin-right: 22px;margin-top: 17px;" data-toggle="modal"
+                                        data-target="#add-department-modal"> <i class="ion ion-plus"></i> Assign
                                         Task</button>
                                 </div>
 
@@ -103,10 +106,10 @@ $roles = json_decode($obj->getRoles());
                                               if($task->status == "Completed"){
                                                 $badge = "right badge badge-success";
                                               }elseif($task->status == "Not Completed"){
-                                                $badge = "right badge badge-warning";
-                                                 $showButtons = "";
-                                              }else{
                                                 $badge = "right badge badge-danger";
+                                                $showButtons = "";
+                                              }else{
+                                                $badge = "right badge badge-warning";
                                                 $showButtons = "";
                                                 }
 
@@ -194,182 +197,182 @@ $roles = json_decode($obj->getRoles());
     <?php include 'includes/scripts.php' ?>
 
     <script>
-        $(document).ready(function() {
-            var Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3500
+    $(document).ready(function() {
+        var Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3500
+        });
+
+        $("#example1").DataTable({
+            "responsive": true,
+            "lengthChange": false,
+            "autoWidth": false,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        $('#example2').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+        });
+
+        $(".add-progress").click(function(e) {
+            console.log("Clicked")
+            e.preventDefault();
+            var id = $(this).data("id");
+            $.ajax({
+                type: 'GET',
+                url: `task_view.php?id=${id}`,
+                success: function(response) {
+                    $("#invoice-details").html(response)
+                }
+            });
+        })
+        $(".showProgress").click(function(e) {
+            console.log("Clicked show progressadmin and hod")
+            e.preventDefault();
+            var id = $(this).data("id");
+            $.ajax({
+                type: 'GET',
+                url: `task_view_sp.php?id=${id}`,
+                success: function(response) {
+                    $("#invoice-details").html(response)
+                }
+            });
+        })
+
+        $('#add-department-modal').on('shown.bs.modal', function() {
+            $('#reservationdatetime, #reservationdatetime1 ').datetimepicker({
+                icons: {
+                    time: 'far fa-clock'
+                }
             });
 
-            $("#example1").DataTable({
-                "responsive": true,
-                "lengthChange": false,
-                "autoWidth": false,
-                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-            $('#example2').DataTable({
-                "paging": true,
-                "lengthChange": false,
-                "searching": false,
-                "ordering": true,
-                "info": true,
-                "autoWidth": false,
-                "responsive": true,
-            });
-
-            $(".add-progress").click(function(e) {
-                console.log("Clicked")
-                e.preventDefault();
-                var id = $(this).data("id");
-                $.ajax({
-                    type: 'GET',
-                    url: `task_view.php?id=${id}`,
-                    success: function(response) {
-                        $("#invoice-details").html(response)
-                    }
-                });
-            })
-            $(".showProgress").click(function(e) {
-                console.log("Clicked show progressadmin and hod")
-                e.preventDefault();
-                var id = $(this).data("id");
-                $.ajax({
-                    type: 'GET',
-                    url: `task_view_sp.php?id=${id}`,
-                    success: function(response) {
-                        $("#invoice-details").html(response)
-                    }
-                });
+            //Date range picker
+            $('#reservation').daterangepicker()
+            //Date range picker with time picker
+            $('#reservationtime').daterangepicker({
+                timePicker: true,
+                timePickerIncrement: 30,
+                locale: {
+                    format: 'MM/DD/YYYY hh:mm A'
+                }
             })
 
-            $('#add-department-modal').on('shown.bs.modal', function() {
-                $('#reservationdatetime, #reservationdatetime1 ').datetimepicker({
-                    icons: {
-                        time: 'far fa-clock'
-                    }
-                });
-
-                //Date range picker
-                $('#reservation').daterangepicker()
-                    //Date range picker with time picker
-                $('#reservationtime').daterangepicker({
-                    timePicker: true,
-                    timePickerIncrement: 30,
-                    locale: {
-                        format: 'MM/DD/YYYY hh:mm A'
-                    }
-                })
-
-                $('#registerButton').click(function(event) {
-                    event.preventDefault();
-                    if (!$('#reservationdatetime').datetimepicker('viewDate') || !$(
-                            '#reservationdatetime1').datetimepicker('viewDate') || !$("#taskName")
-                        .val() || !$("#employee")
-                        .val()) {
-                        Toast.fire({
-                            icon: 'error',
-                            title: 'Please fill in all the fields'
-                        })
-                        return;
-                    }
-
-                    var startDate = $('#reservationdatetime').datetimepicker('viewDate').format(
-                        'YYYY-MM-DD HH:mm:ss');
-                    var endDate = $('#reservationdatetime1').datetimepicker('viewDate').format(
-                        'YYYY-MM-DD HH:mm:ss');
-
-                    if ($("#password").val() != $("#password2").val()) {
-                        Toast.fire({
-                            icon: 'error',
-                            title: 'Passwords do not match'
-                        })
-                        return;
-                    }
-
-                    var button = $("#registerButton")
-                    button.text("Submitting..")
-                    button.prop("disabled", true)
-
-                    $.ajax({
-                        type: 'POST',
-                        url: 'middleware.php',
-                        data: {
-                            addTask: true,
-                            employee: $("#employee").val(),
-                            taskName: $("#taskName").val(),
-                            manager: "",
-                            supervisor: '<?php echo $userId ?>',
-                            startDate: startDate,
-                            endDate: endDate,
-                            createdBy: '<?php echo $userId ?>',
-                            taskDetails: $("#taskDetails").val()
-                        },
-                        success: function(response) {
-                            button.text("Submit")
-                            button.prop("disabled", false)
-                            console.log(response);
-
-                            var response = JSON.parse(response)
-                            if (response.status == "success") {
-                                Toast.fire({
-                                    icon: "success",
-                                    title: "Successfully added employee"
-                                })
-                                location.reload();
-                            } else {
-                                button.text("Submit")
-                                button.prop("disabled", false)
-                                Toast.fire({
-                                    icon: 'error',
-                                    title: response.message
-                                })
-                            }
-                        }
+            $('#registerButton').click(function(event) {
+                event.preventDefault();
+                if (!$('#reservationdatetime').datetimepicker('viewDate') || !$(
+                        '#reservationdatetime1').datetimepicker('viewDate') || !$("#taskName")
+                    .val() || !$("#employee")
+                    .val()) {
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Please fill in all the fields'
                     })
-                });
+                    return;
+                }
 
-                // Reset form validation on modal close
-                $('#add-plan').on('hidden.bs.modal', function() {
-                    $('#add-plan-form')[0].reset();
-                    $('#add-plan-form input, #add-plan-form select').removeClass('is-invalid');
-                });
-            });
+                var startDate = $('#reservationdatetime').datetimepicker('viewDate').format(
+                    'YYYY-MM-DD HH:mm:ss');
+                var endDate = $('#reservationdatetime1').datetimepicker('viewDate').format(
+                    'YYYY-MM-DD HH:mm:ss');
 
-            $(".approve").click(function(e) {
-                e.preventDefault();
+                if ($("#password").val() != $("#password2").val()) {
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Passwords do not match'
+                    })
+                    return;
+                }
+
+                var button = $("#registerButton")
+                button.text("Submitting..")
+                button.prop("disabled", true)
+
                 $.ajax({
                     type: 'POST',
                     url: 'middleware.php',
                     data: {
-                        completeTask: true,
-                        id: $(this).data("id")
+                        addTask: true,
+                        employee: $("#employee").val(),
+                        taskName: $("#taskName").val(),
+                        manager: "",
+                        supervisor: '<?php echo $userId ?>',
+                        startDate: startDate,
+                        endDate: endDate,
+                        createdBy: '<?php echo $userId ?>',
+                        taskDetails: $("#taskDetails").val()
                     },
                     success: function(response) {
+                        button.text("Submit")
+                        button.prop("disabled", false)
                         console.log(response);
-                        var parsedResponse = JSON.parse(response);
-                        if (parsedResponse.status == "success") {
+
+                        var response = JSON.parse(response)
+                        if (response.status == "success") {
                             Toast.fire({
                                 icon: "success",
                                 title: "Successfully added employee"
-                            });
+                            })
                             location.reload();
                         } else {
+                            button.text("Submit")
+                            button.prop("disabled", false)
                             Toast.fire({
-                                icon: "error",
-                                title: parsedResponse.message
-                            });
+                                icon: 'error',
+                                title: response.message
+                            })
                         }
                     }
-                });
-            })
+                })
+            });
 
-            showProgress
+            // Reset form validation on modal close
+            $('#add-plan').on('hidden.bs.modal', function() {
+                $('#add-plan-form')[0].reset();
+                $('#add-plan-form input, #add-plan-form select').removeClass('is-invalid');
+            });
+        });
 
-
-
-
+        $(".approve").click(function(e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: 'middleware.php',
+                data: {
+                    completeTask: true,
+                    id: $(this).data("id")
+                },
+                success: function(response) {
+                    console.log(response);
+                    var parsedResponse = JSON.parse(response);
+                    if (parsedResponse.status == "success") {
+                        Toast.fire({
+                            icon: "success",
+                            title: "Successfully added employee"
+                        });
+                        location.reload();
+                    } else {
+                        Toast.fire({
+                            icon: "error",
+                            title: parsedResponse.message
+                        });
+                    }
+                }
+            });
         })
+
+        showProgress
+
+
+
+
+    })
     </script>
 </body>
 
@@ -403,7 +406,8 @@ $roles = json_decode($obj->getRoles());
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label for="exampleInputEmail1">Task Name</label>
-                                <input type="text" class="form-control" placeholder="Task Name" name="taskName" id="taskName" required>
+                                <input type="text" class="form-control" placeholder="Task Name" name="taskName"
+                                    id="taskName" required>
                             </div>
                         </div>
                     </div>
@@ -411,7 +415,8 @@ $roles = json_decode($obj->getRoles());
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label for="exampleInputEmail1">Task Details</label>
-                                <input type="text" class="form-control" placeholder="Task Details" name="taskName" id="taskDetails" required>
+                                <input type="text" class="form-control" placeholder="Task Details" name="taskName"
+                                    id="taskDetails" required>
                             </div>
                         </div>
                     </div>
@@ -469,8 +474,10 @@ $roles = json_decode($obj->getRoles());
                             <div class="form-group">
                                 <label>Start Date</label>
                                 <div class="input-group date" id="reservationdatetime" data-target-input="nearest">
-                                    <input type="text" class="form-control datetimepicker-input" data-target="#reservationdatetime" placeholder="Select Start Date" />
-                                    <div class="input-group-append" data-target="#reservationdatetime" data-toggle="datetimepicker">
+                                    <input type="text" class="form-control datetimepicker-input"
+                                        data-target="#reservationdatetime" placeholder="Select Start Date" />
+                                    <div class="input-group-append" data-target="#reservationdatetime"
+                                        data-toggle="datetimepicker">
                                         <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                     </div>
                                 </div>
@@ -480,8 +487,10 @@ $roles = json_decode($obj->getRoles());
                             <div class="form-group">
                                 <label>End Date</label>
                                 <div class="input-group date" id="reservationdatetime1" data-target-input="nearest">
-                                    <input type="text" class="form-control datetimepicker-input" data-target="#reservationdatetime1" placeholder="Select End Date" />
-                                    <div class="input-group-append" data-target="#reservationdatetime1" data-toggle="datetimepicker">
+                                    <input type="text" class="form-control datetimepicker-input"
+                                        data-target="#reservationdatetime1" placeholder="Select End Date" />
+                                    <div class="input-group-append" data-target="#reservationdatetime1"
+                                        data-toggle="datetimepicker">
                                         <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                     </div>
                                 </div>

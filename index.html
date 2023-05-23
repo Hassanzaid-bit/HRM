@@ -36,7 +36,7 @@ if(!empty($tasks)){
         $allTasks += 1;
         if($task->status == "Completed"){
             $completedTasks += 1;
-        }elseif($task->status == "Not Completed"){
+        }elseif($task->status == "Pending"){
             $pendingTasks += 1;
         }
     }

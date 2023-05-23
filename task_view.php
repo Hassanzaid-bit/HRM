@@ -13,7 +13,7 @@ if(isset($_GET["id"])){
 ?>
 
 <p style="margin-bottom: 5px">Task Name : <?php echo $task->name ?></p>
-<p style="margin-bottom: 5px">Description : <?php echo $task->description ?></p>
+<p style="margin-bottom: 5px">Description : <?php echo $task->details ?></p>
 <p style="margin-bottom: 5px">Status : <?php echo $task->status ?></p>
 <p style="margin-bottom: 5px">Start End : <?php echo $task->startDate ?></p>
 <p style="margin-bottom: 5px">End Date : <?php echo $task->endDate ?></p>

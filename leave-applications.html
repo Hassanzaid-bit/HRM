@@ -1,10 +1,25 @@
 <?php 
 
 require_once 'sessionData.php';
-$leaveApplications = json_decode($obj->getLeaveApplications());
+
 $employee = json_decode($obj->getEmployeeById($userId));
 $leaveTypes = json_decode($obj->getLeaveTypes());
 
+if($role == 2){
+    // Get leave applications from department
+    $leaveApplications = json_decode($obj->getLeaveApplicationsByDept($department));
+}else if($role == 1){
+    // Get leave applications tasks by id
+    $leaveApplications = json_decode($obj->getEmployeeLeaveApplications($userId));
+}else if($role == 3){
+    $leaveApplications = json_decode($obj->getLeaveApplications());
+}
+
+$departments = json_decode($obj->getDepartments());
+$roles = json_decode($obj->getRoles());
+
+
+ 
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -58,7 +73,9 @@ $leaveTypes = json_decode($obj->getLeaveTypes());
                             <!-- Custom tabs (Charts with tabs)-->
                             <div class="card">
                                 <div style="display: flex;justify-content: end;">
-                                    <button type="button" class="btn btn-block btn-primary" style="width: 163px;margin-right: 22px;margin-top: 17px;" data-toggle="modal" data-target="#add-department-modal"> <i class="ion ion-plus"></i>Apply for
+                                    <button type="button" class="btn btn-block btn-primary"
+                                        style="width: 163px;margin-right: 22px;margin-top: 17px;" data-toggle="modal"
+                                        data-target="#add-department-modal"> <i class="ion ion-plus"></i>Apply for
                                         Leave</button>
                                 </div>
                                 <!-- /.card-header -->
@@ -157,143 +174,89 @@ $leaveTypes = json_decode($obj->getLeaveTypes());
     </div>
     <?php include 'includes/scripts.php' ?>
     <script>
-        $(document).ready(function() {
-            var Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3500
-            });
-            $("#example1").DataTable({
-                "responsive": true,
-                "lengthChange": false,
-                "autoWidth": false,
-                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-            $('#example2').DataTable({
-                "paging": true,
-                "lengthChange": false,
-                "searching": false,
-                "ordering": true,
-                "info": true,
-                "autoWidth": false,
-                "responsive": true,
-            });
+    $(document).ready(function() {
+        var Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3500
+        });
+        $("#example1").DataTable({
+            "responsive": true,
+            "lengthChange": false,
+            "autoWidth": false,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        $('#example2').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+        });
 
-            $('#add-department-modal').on('shown.bs.modal', function() {
-                var startDateField = $('#start-date');
-                var endDateField = $('#end-date');
+        $('#add-department-modal').on('shown.bs.modal', function() {
+            var startDateField = $('#start-date');
+            var endDateField = $('#end-date');
 
-                function calculateDays() {
-                    var startDateString = startDateField.val();
-                    var endDateString = endDateField.val();
+            function calculateDays() {
+                var startDateString = startDateField.val();
+                var endDateString = endDateField.val();
 
-                    if (startDateString && endDateString) {
-                        var startDate = new Date(startDateString);
-                        var endDate = new Date(endDateString);
+                if (startDateString && endDateString) {
+                    var startDate = new Date(startDateString);
+                    var endDate = new Date(endDateString);
 
-                        if (startDate > endDate) {
-                            Toast.fire({
-                                icon: 'error',
-                                title: "Start date cannot be greater than end date"
-                            })
-                            return;
-                        }
-
-                        var timeDifference = endDate.getTime() - startDate.getTime();
-                        var daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
-                        $('#duration').val(daysDifference);
-                    }
-                }
-
-                startDateField.on('change', calculateDays);
-                endDateField.on('change', calculateDays);
-
-                $('#add-leave-button').click(function(event) {
-                    event.preventDefault();
-                    if (!$("#duration").val() || !$("#leave-type").val() || !$("#start-date")
-                        .val() || !$("#end-date").val()) {
+                    if (startDate > endDate) {
                         Toast.fire({
                             icon: 'error',
-                            title: 'Please fill in all the fields'
+                            title: "Start date cannot be greater than end date"
                         })
                         return;
                     }
 
-                    var button = $("#add-leave-button")
-                    button.text("Submitting..")
-                    button.prop("disabled", true)
+                    var timeDifference = endDate.getTime() - startDate.getTime();
+                    var daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
+                    $('#duration').val(daysDifference);
+                }
+            }
 
-                    $.ajax({
-                        type: 'POST',
-                        url: 'middleware.php',
-                        data: {
-                            addLeaveApplication: true,
-                            employeeId: $("#employee-id").data("id"),
-                            leaveType: $("#leave-type").val(),
-                            startDate: $("#start-date").val(),
-                            endDate: $("#end-date").val(),
-                            comment: $("#comment").val(),
-                            duration: $("#duration").val()
-                        },
-                        success: function(response) {
-                            button.text("Submit")
-                            button.prop("disabled", false)
+            startDateField.on('change', calculateDays);
+            endDateField.on('change', calculateDays);
 
-                            var response = JSON.parse(response)
-                            if (response.status == "success") {
-                                Toast.fire({
-                                    icon: "success",
-                                    title: "Successfully added leave application"
-                                })
-                                location.reload();
-                            } else {
-                                button.text("Submit")
-                                button.prop("disabled", false)
-                                Toast.fire({
-                                    icon: 'error',
-                                    title: response.message
-                                })
-                            }
-                        }
+            $('#add-leave-button').click(function(event) {
+                event.preventDefault();
+                if (!$("#duration").val() || !$("#leave-type").val() || !$("#start-date")
+                    .val() || !$("#end-date").val()) {
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Please fill in all the fields'
                     })
-                });
+                    return;
+                }
 
-                // Reset form validation on modal close
-                $('#add-plan').on('hidden.bs.modal', function() {
-                    $('#add-plan-form')[0].reset();
-                    $('#add-plan-form input, #add-plan-form select').removeClass('is-invalid');
-                });
-            });
-
-            $(".department-view-button").click(function(e) {
-                e.preventDefault();
-                var id = $(this).data("id");
-                $.ajax({
-                    type: 'GET',
-                    url: `leave_type_view.php?id=${id}`,
-                    success: function(response) {
-                        $("#department-details").html(response)
-                    }
-                });
-            })
-
-            $(".approve").click(function(e) {
-                e.preventDefault();
-                var button = $(this)
-                    // button.prop("disabled", true)
-                    // $(".reject").prop("disabled", true)
+                var button = $("#add-leave-button")
+                button.text("Submitting..")
+                button.prop("disabled", true)
 
                 $.ajax({
                     type: 'POST',
                     url: 'middleware.php',
                     data: {
-                        approveLeave: true,
-                        id: button.data("id"),
-                        userId: '<?php echo $userId ?>'
+                        addLeaveApplication: true,
+                        employeeId: $("#employee-id").data("id"),
+                        leaveType: $("#leave-type").val(),
+                        startDate: $("#start-date").val(),
+                        endDate: $("#end-date").val(),
+                        comment: $("#comment").val(),
+                        duration: $("#duration").val()
                     },
                     success: function(response) {
-                        console.log(response)
+                        button.text("Submit")
+                        button.prop("disabled", false)
+
                         var response = JSON.parse(response)
                         if (response.status == "success") {
                             Toast.fire({
@@ -302,54 +265,108 @@ $leaveTypes = json_decode($obj->getLeaveTypes());
                             })
                             location.reload();
                         } else {
+                            button.text("Submit")
                             button.prop("disabled", false)
-                            $(".reject").prop("disabled", false)
                             Toast.fire({
-                                icon: "error",
+                                icon: 'error',
                                 title: response.message
                             })
                         }
                     }
-
                 })
-            })
-            $(".reject").click(function(e) {
-                e.preventDefault();
-                var button = $(this)
-                    // button.prop("disabled", true)
-                    // $(".reject").prop("disabled", true)
+            });
 
-                $.ajax({
-                    type: 'POST',
-                    url: 'middleware.php',
-                    data: {
-                        rejectLeave: true,
-                        id: button.data("id"),
-                        userId: '<?php echo $userId ?>'
-                    },
-                    success: function(response) {
-                        console.log(response)
-                        var response = JSON.parse(response)
-                        if (response.status == "success") {
-                            Toast.fire({
-                                icon: "success",
-                                title: "Successfully rejected leave application"
-                            })
-                            location.reload();
-                        } else {
-                            button.prop("disabled", false)
-                            $(".reject").prop("disabled", false)
-                            Toast.fire({
-                                icon: "error",
-                                title: response.message
-                            })
-                        }
-                    }
+            // Reset form validation on modal close
+            $('#add-plan').on('hidden.bs.modal', function() {
+                $('#add-plan-form')[0].reset();
+                $('#add-plan-form input, #add-plan-form select').removeClass('is-invalid');
+            });
+        });
 
-                })
-            })
-
+        $(".department-view-button").click(function(e) {
+            e.preventDefault();
+            var id = $(this).data("id");
+            $.ajax({
+                type: 'GET',
+                url: `leave_type_view.php?id=${id}`,
+                success: function(response) {
+                    $("#department-details").html(response)
+                }
+            });
         })
+
+        $(".approve").click(function(e) {
+            e.preventDefault();
+            var button = $(this)
+            // button.prop("disabled", true)
+            // $(".reject").prop("disabled", true)
+
+            $.ajax({
+                type: 'POST',
+                url: 'middleware.php',
+                data: {
+                    approveLeave: true,
+                    id: button.data("id"),
+                    userId: '<?php echo $userId ?>'
+                },
+                success: function(response) {
+                    console.log(response)
+                    var response = JSON.parse(response)
+                    if (response.status == "success") {
+                        Toast.fire({
+                            icon: "success",
+                            title: "Successfully added leave application"
+                        })
+                        location.reload();
+                    } else {
+                        button.prop("disabled", false)
+                        $(".reject").prop("disabled", false)
+                        Toast.fire({
+                            icon: "error",
+                            title: response.message
+                        })
+                    }
+                }
+
+            })
+        })
+        $(".reject").click(function(e) {
+            e.preventDefault();
+            var button = $(this)
+            // button.prop("disabled", true)
+            // $(".reject").prop("disabled", true)
+
+            $.ajax({
+                type: 'POST',
+                url: 'middleware.php',
+                data: {
+                    rejectLeave: true,
+                    id: button.data("id"),
+                    userId: '<?php echo $userId ?>'
+                },
+                success: function(response) {
+                    console.log(response)
+                    var response = JSON.parse(response)
+                    if (response.status == "success") {
+                        Toast.fire({
+                            icon: "success",
+                            title: "Successfully rejected leave application"
+                        })
+                        location.reload();
+                    } else {
+                        button.prop("disabled", false)
+                        $(".reject").prop("disabled", false)
+                        Toast.fire({
+                            icon: "error",
+                            title: response.message
+                        })
+                    }
+                }
+
+            })
+        })
+
+    })
     </script>
 </body>
 
@@ -382,7 +399,9 @@ $leaveTypes = json_decode($obj->getLeaveTypes());
                     <div class="card-body">
                         <div class="form-group">
                             <label>Employee Name</label>
-                            <input type="text" class="form-control" id="employee-id" placeholder="Enter leave name" value="<?php echo $employee->firstName . " " . $employee->lastName ?>" data-id="<?php echo $employee->id ?>" disabled>
+                            <input type="text" class="form-control" id="employee-id" placeholder="Enter leave name"
+                                value="<?php echo $employee->firstName . " " . $employee->lastName ?>"
+                                data-id="<?php echo $employee->id ?>" disabled>
                         </div>
                         <div class="form-group">
                             <label for="">Leave Type</label>
@@ -399,7 +418,8 @@ $leaveTypes = json_decode($obj->getLeaveTypes());
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Start Date</label>
-                                    <input type="date" class="form-control" id="start-date" placeholder="Enter Start Date">
+                                    <input type="date" class="form-control" id="start-date"
+                                        placeholder="Enter Start Date">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -412,7 +432,8 @@ $leaveTypes = json_decode($obj->getLeaveTypes());
 
                         <div class="form-group">
                             <label>Duration(days)</label>
-                            <input type="number" class="form-control" id="duration" placeholder="Enter leave days . E.g 21" disabled>
+                            <input type="number" class="form-control" id="duration"
+                                placeholder="Enter leave days . E.g 21" disabled>
                         </div>
 
                         <div class="form-group">
@@ -421,7 +442,8 @@ $leaveTypes = json_decode($obj->getLeaveTypes());
                         </div>
                     </div>
                     <div class="card-footer" style="background: none;">
-                        <button type="submit" class="btn btn-primary" style="width: 100%;" id="add-leave-button">Submit</button>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;"
+                            id="add-leave-button">Submit</button>
                     </div>
                 </form>
             </div>

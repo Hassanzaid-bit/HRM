@@ -13,7 +13,7 @@ if(isset($_GET["id"])){
 ?>
 
 <p style="margin-bottom: 5px">Task Name : <?php echo $task->name ?></p>
-<p style="margin-bottom: 5px">Description : <?php echo $task->description ?></p>
+<p style="margin-bottom: 5px">Description : <?php echo $task->details ?></p>
 <p style="margin-bottom: 5px">Status : <?php echo $task->status ?></p>
 <p style="margin-bottom: 5px">Start End : <?php echo $task->startDate ?></p>
 <p style="margin-bottom: 5px">End Date : <?php echo $task->endDate ?></p>
@@ -37,15 +37,15 @@ if(isset($_GET["id"])){
     }
     echo $table;
 ?>
-<?php if($task->status != "Completed"){ ?>
+<?php if($task->status == "Pending"){ ?>
 
 <form id="add-plan-form" style="margin-top : 10px">
     <input type="hidden" value="<?php echo $task->id ?>" class="form-control" id="taskId">
     <div class="row ">
-        <div class="col-12">
+        <div class="col-12 mt-2">
             <button type="submit" class="btn btn-primary btn-block" id="approve">Mark as Completed</button>
         </div>
-        <div class="col-12">
+        <div class="col-12 mt-2">
             <button type="submit" class="btn btn-secondary btn-block" id="reject">Mark as Incomplete</button>
         </div>
     </div>
