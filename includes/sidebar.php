@@ -25,7 +25,8 @@ function isActive($currentUrl, $targetUrl)
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="info">
                 <a href="#" class="d-block"><?php echo $userName ?></a>
-                <p style="color:white"> Role : <?php echo $rolename ?></p>
+                <p style="color:white;margin-bottom: 0;"> Role : <?php echo $rolename ?></p>
+                <p style="color:white"> Department : <?php echo $_SESSION["departmentName"] ?></p>
             </div>
         </div>
 

@@ -105,6 +105,7 @@ if(isset($_POST["login"])){
             $_SESSION["userName"] = $data->firstName . " " . $data->lastName;
             $_SESSION["role"] = $data->role;
             $_SESSION["department"] = $data->department;
+            $_SESSION["departmentName"] = json_decode($obj->getDepartmentById($data->department))->name;
             
             echo json_encode($result) ;
         } else {

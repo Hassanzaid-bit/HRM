@@ -102,8 +102,6 @@ $roles = json_decode($obj->getRoles());
                                                     }else{
                                                         $comment = $leaveType->comment;
                                                     }
-
-
                                                     $badge = "";
                                                     $showButtons = "";
                                                     if($leaveType->status == "Approved"){
@@ -220,6 +218,8 @@ $roles = json_decode($obj->getRoles());
                     var timeDifference = endDate.getTime() - startDate.getTime();
                     var daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
                     $('#duration').val(daysDifference);
+
+                    console.log("Leave days changed")
                 }
             }
 
